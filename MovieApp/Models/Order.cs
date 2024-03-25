@@ -1,8 +1,13 @@
-﻿namespace MovieApp.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace MovieApp.Models
 {
 	public class Order
 	{
-		public virtual EShopApplicationUser User { get; set; }
+        [Key]
+        public Guid id { get; set; }
+        public virtual EShopApplicationUser User { get; set; }
 
-	}
+        public int MyProperty { get; set; }
+    }
 }
