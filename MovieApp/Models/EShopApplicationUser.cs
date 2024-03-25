@@ -8,6 +8,7 @@ namespace MovieApp.Models
         public string LastName { get; set; }
         public string Address { get; set; }
         public virtual ICollection<Ticket> MyTickets { get; set; }
+        public virtual Order Order { get; set; }
     }
 
 }
