@@ -10,6 +10,6 @@ namespace MovieApp.Models
 
         [ForeignKey("UserId")]
         public virtual EShopApplicationUser User { get; set; }
-        public virtual List<Ticket> Tickets { get; set; }
+        public virtual List<TicketInOrder> Tickets { get; set; }
     }
 }
