@@ -7,7 +7,6 @@ namespace MovieApp.Models
         [Key]
         public Guid id { get; set; }
         public virtual EShopApplicationUser User { get; set; }
-
-        public int MyProperty { get; set; }
+        public virtual List<Ticket> Tickets { get; set; }
     }
 }
