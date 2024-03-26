@@ -1,4 +1,4 @@
-﻿@model MovieApp.Models.TicketInOrder
+﻿@model MovieApp.Models.DTO.TicketInOrderDTO
 
 @{
     ViewData["Title"] = "Create";
@@ -14,6 +14,8 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
+                <select asp-for="TicketId" class="form-control" asp-items="ViewBag.TicketId"></select>
+                <input type="hidden" asp-for="OrderId" value="@ViewData["OrderId"]"/>
             </div>
         </form>
     </div>

@@ -34,17 +34,45 @@ namespace MovieApp.Controllers
             var loggedInUser = await _context.Users
                 .OfType<EShopApplicationUser>()
                 .Include(e => e.Order)
-                .Include("Order.Tickets")
+                .ThenInclude(o => o.Tickets)
                 .FirstOrDefaultAsync(e => e.Id == userId);
+
+            double totalPrice = 0.0;
+
+            foreach(TicketInOrder tio in loggedInUser.Order.Tickets)
+            {
+                var price = _context.TicketOrders
+                    .Include(to => to.Ticket)
+                    .First(to => to.Id == tio.Id)
+                    .Ticket.Price;
+                totalPrice += price;
+            }
 
             var model = new OrderDTO
             {
                 AllTickets = loggedInUser.Order.Tickets,
-                TotalPrice = loggedInUser.Order.Tickets.Sum(t => t.Ticket.Price)
+                TotalPrice = totalPrice
             };
 
             return View(model);
         }
+
+        public async Task<IActionResult> Order()
+        {
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+			if (userId == null)
+			{
+				return View();
+			}
+
+            var loggedInUser = await _context.Users
+                .OfType<EShopApplicationUser>().FirstAsync();
+
+            loggedInUser.Order = new Order();
+
+            return RedirectToAction(nameof(Index));
+		}
 
         // GET: Order/Details/5
         public async Task<IActionResult> Details(Guid? id)
@@ -65,9 +93,34 @@ namespace MovieApp.Controllers
         }
 
         // GET: Order/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+			//find all tickets
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+			if (userId == null)
+			{
+				return View();
+			}
+
+            var loggedInUser = await _context.Users
+                .OfType<EShopApplicationUser>()
+                .Include(e => e.MyTickets)
+                .Include(e => e.Order)
+                .Include("MyTickets.Movie")
+                .FirstAsync(e => e.Id == userId);
+
+            var withNames = from t in loggedInUser.MyTickets
+                            select new
+                            {
+                                Id = t.Id,
+                                Name = t.Movie.MovieName + " " + t.Price
+                            };
+
+            ViewBag.TicketId = new SelectList(withNames, "Id", "Name");
+            ViewData["OrderId"] = loggedInUser.Order.id;
             return View();
+
         }
 
         // POST: Order/Create
@@ -75,16 +128,15 @@ namespace MovieApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id")] TicketInOrder ticketInOrder)
+        public async Task<IActionResult> Create(TicketInOrderDTO ticketInOrderDto)
         {
-            if (ModelState.IsValid)
-            {
-                ticketInOrder.Id = Guid.NewGuid();
-                _context.Add(ticketInOrder);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(ticketInOrder);
+            TicketInOrder tio = new TicketInOrder();
+            tio.Id = new Guid();
+            tio.Ticket = await _context.Tickets.FirstAsync(t => t.Id == ticketInOrderDto.TicketId);
+            tio.Order = await _context.Orders.FirstAsync(o => o.id == ticketInOrderDto.OrderId);
+            await _context.TicketOrders.AddAsync(tio);
+            _context.SaveChanges();
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Order/Edit/5
