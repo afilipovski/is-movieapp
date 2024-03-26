@@ -48,9 +48,18 @@ namespace MovieApp.Controllers
                 totalPrice += price;
             }
 
+            List<TicketInOrder> ticketInOrders = loggedInUser.Order.Tickets;
+
+            foreach(TicketInOrder tio in ticketInOrders)
+            {
+                tio.Ticket.Movie = _context.Tickets.Include(t => t.Movie).First(t => t.Id == tio.Ticket.Id).Movie;
+            }
+
+
+
             var model = new OrderDTO
             {
-                AllTickets = loggedInUser.Order.Tickets,
+                AllTickets = ticketInOrders,
                 TotalPrice = totalPrice
             };
 

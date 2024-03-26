@@ -20,15 +20,21 @@
 @foreach (var item in Model.AllTickets) {
         <tr>
             <td>
-                
+                @item.Ticket.Movie.MovieName
             </td>
             <td>
-                
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                @item.Ticket.Price
+            </td>
+            <td>
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
 }
     </tbody>
+    <tfoot>
+        <tr>
+            <td>Total price:</td>
+            <td>@Model.TotalPrice</td>
+        </tr>
+    </tfoot>
 </table>
