@@ -1,4 +1,4 @@
-﻿@model IEnumerable<MovieApp.Models.TicketInOrder>
+﻿@model MovieApp.Models.DTO.OrderDTO
 
 @{
     ViewData["Title"] = "Index";
@@ -16,7 +16,7 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.AllTickets) {
         <tr>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

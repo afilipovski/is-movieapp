@@ -33,7 +33,8 @@ namespace MovieApp.Controllers
 
             var loggedInUser = await _context.Users
                 .OfType<EShopApplicationUser>()
-                .Include(e => e.MyTickets)
+                .Include(e => e.Order)
+                .Include("Order.Tickets")
                 .FirstOrDefaultAsync(e => e.Id == userId);
 
             var model = new OrderDTO
